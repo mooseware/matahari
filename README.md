@@ -11,7 +11,7 @@ Here's how to use Matahari:
         Matahari::spy('test-marker', array(5,6,7,8));
         Matahari::spy('test-marker2', array('key' => 'test'));
 
-        return View::make('intro.index')->with('output', Matahari::spit());
+        return View::make('view.index')->with('output', Matahari::spit());
     });
 
     
