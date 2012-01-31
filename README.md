@@ -7,9 +7,9 @@ Here's how to use Matahari:
 
     Router::register(array('GET /', 'GET /home'), function()
     {
-        Matahari::spy('test-marker', array(1,2,3,4));
-        Matahari::spy('test-marker', array(5,6,7,8));
-        Matahari::spy('test-marker2', array('key' => 'test'));
+        Matahari::spy(array(1,2,3,4), 'test-marker');
+        Matahari::spy(array(5,6,7,8), 'test-marker');
+        Matahari::spy(array('key' => 'test'));
 
         return View::make('view.index')->with('output', Matahari::spit());
     });
