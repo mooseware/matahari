@@ -2,12 +2,11 @@
 
 class Matahari {
 
-	const VERSION = '0.2.0';
+	const VERSION = '0.3.0';
 	
-	private static $dump_request 	= false; // dump $_REQUEST array
-	private static $dump_session 	= false; // dump $_SESSION array
-	private static $_date			= date('Y-m-d H:i:s');
-
+	private static $dump_request 	= false; 
+	private static $dump_session 	= false;
+	
 	private static $markers 		= array();
 	private static $meta 			= array();
 	private static $time 			= '';
@@ -26,7 +25,7 @@ class Matahari {
 			static::$time['start'] = microtime(true);
 		}
 
-		$message = '<span class="date_field">set at <em>'.static::$_date.'</em></span><br><span class="message">'.static::pre(print_r($marker, true)).'</span><br><span class="meta_field">'.$meta.'</span>';
+		$message = '<span class="date_field">set at <em>'.date('Y-m-d H:i:s').'</em></span><br><span class="message">'.static::pre(print_r($marker, true)).'</span><br><span class="meta_field">'.$meta.'</span>';
 		
 		if (is_array(static::$markers[$marker_name])) {
 			array_push(static::$markers[$marker_name], $marker);
