@@ -2,7 +2,7 @@
 
 class Matahari {
 
-	const VERSION = '0.3.0';
+	const VERSION = '0.3.1';
 	
 	private static $dump_request 	= false; 
 	private static $dump_session 	= false;
@@ -28,9 +28,9 @@ class Matahari {
 		$message = '<span class="date_field">set at <em>'.date('Y-m-d H:i:s').'</em></span><br><span class="message">'.static::pre(print_r($marker, true)).'</span><br><span class="meta_field">'.$meta.'</span>';
 		
 		if (is_array(static::$markers[$marker_name])) {
-			array_push(static::$markers[$marker_name], $marker);
+			array_push(static::$markers[$marker_name], $message);
 		} else {
-			static::$markers[$marker_name] = array($marker);
+			static::$markers[$marker_name] = array($message);
 		}
 	}
 	
