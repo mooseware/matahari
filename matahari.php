@@ -2,18 +2,16 @@
 
 class Matahari {
 
-	const VERSION = '1.0';
+	const VERSION = '0.2.0';
 	
-	private $always_show_request_array = true;
-	private $always_show_session_array = false;
+	private static $always_show_request_array = true;
+	private static $always_show_session_array = false;
 
-	private $markers 	= array();
-	private $meta 		= array();
-	private $time 		= '';
+	private static $markers 	= array();
+	private static $meta 		= array();
+	private static $time 		= '';
 
-	public function __construct() {
-		$this->time['Script Start'] = microtime(true);
-	}
+	final private function __construct() {}
 	
 	/**
 	 * spy on the code to gather some information
@@ -22,13 +20,17 @@ class Matahari {
 	 * @param mixed 	$message
 	 * @param string 	$meta
 	 */
-	public function spy($marker_name, $message = '', $meta = '') {
-		$message = '<span class="date_field">set at <em>' . date('Y-m-d H:i:s') . '</em></span><br><span class="message">' . $this->pre(print_r($message, true)) . '</span><br><span class="meta_field">' . $meta . '</span>';
+	public static function spy($marker_name, $message = '', $meta = '') {
+		if (! isset(static::$time['Script Start'])) {
+			static::$time['Script Start'] = microtime(true);
+		}
+
+		$message = '<span class="date_field">set at <em>' . date('Y-m-d H:i:s') . '</em></span><br><span class="message">' . static::pre(print_r($message, true)) . '</span><br><span class="meta_field">' . $meta . '</span>';
 		
-		if (is_array($this->markers[$marker_name])) {
-			array_push($this->markers[$marker_name], $message);
+		if (is_array(static::$markers[$marker_name])) {
+			array_push(static::$markers[$marker_name], $message);
 		} else {
-			$this->markers[$marker_name] = array($message);
+			static::$markers[$marker_name] = array($message);
 		}
 	}
 	
@@ -37,21 +39,21 @@ class Matahari {
 	 *
 	 * @return string
 	 */
-	public function spit() {
-		$this->time['Script End'] = microtime(true);
+	public static function spit() {
+		static::$time['Script End'] = microtime(true);
 
-		$script_duration = number_format($this->time['Script End'] - $this->time['Script Start'], 6, ',', '.');
-		if ($this->always_show_request_array) $this->meta['$_REQUEST'] = $this->pre(print_r($_REQUEST, true));
-		if ($this->always_show_session_array) $this->meta['$_SESSION'] = $this->pre(print_r($_SESSION, true));
+		$script_duration = number_format(static::$time['Script End'] - static::$time['Script Start'], 6, ',', '.');
+		if (static::$always_show_request_array) static::$meta['$_REQUEST'] = static::pre(print_r($_REQUEST, true));
+		if (static::$always_show_session_array) static::$meta['$_SESSION'] = static::pre(print_r($_SESSION, true));
 		
 		$html = '';
-		$html.= $this->css();
+		$html.= static::css();
 		$html.= '<div id="mata_hari_debug"><div id="title">Mata Hari - exotic espionage for PHP</div>';
 		$html.= '<div id="mata_hari_keys">';
 		
 		// Spy marker header list
 		$html.= '<div class="mata_hari_keys_list"><h1>Markers:</h1><ul>';
-		foreach ($this->markers as $key => $value) {
+		foreach (static::$markers as $key => $value) {
 			$html.= '<li><a href="#' . md5($key) . '">' . $key . ' (' . count($value) . ')' . '</a></li>';
 		}
 		$html.= '</ul></div>';
@@ -67,13 +69,13 @@ class Matahari {
 		$html.= '<div id="mata_hari_values">';
 		
 		// Markers
-		foreach ($this->markers as $key => $value) {
-			$html.= $this->dump_marker($key, $value).'<br />';
+		foreach (static::$markers as $key => $value) {
+			$html.= static::dump_marker($key, $value).'<br />';
 		}
 		
 		// Meta info
-		foreach ($this->meta as $key => $value) {
-			$html.= $this->make_meta_list($key, $value);
+		foreach (static::$meta as $key => $value) {
+			$html.= static::make_meta_list($key, $value);
 		}
 		
 		$html.= '</div><br style="clear: both;" />';
@@ -89,7 +91,7 @@ class Matahari {
 	 * @param array $marker
 	 * @return string
 	 */
-	private function dump_marker($title, $marker) {
+	private static function dump_marker($title, $marker) {
 		$html = '<div id="' . md5($title) . '" class="spy-marker"><h1>Spy Marker: ' . $title . '</h1><div>';
 		
 		foreach ($marker as $key => $value) {
@@ -107,7 +109,7 @@ class Matahari {
 	 * @param mixed $array
 	 * @return string
 	 */
-	private function make_meta_list($title, $array) {
+	private static function make_meta_list($title, $array) {
 		$html = '<div id="' . md5($title) . '"><h1>Meta Info: ' . $title . '</h1>';
 		// get the print_r info into the var
 		$html.= print_r($array, true);
@@ -121,7 +123,7 @@ class Matahari {
 	 *
 	 * @return string
 	 */
-	private function css() {
+	private static function css() {
 		return '
 		<style>
 			#mata_hari_debug {
@@ -210,7 +212,7 @@ class Matahari {
 	 * @param string $string
 	 * @return string
 	 */
-	private function pre($string) {
+	private static function pre($string) {
 		return '<pre>' . $string . '</pre>';
 	}
 

@@ -7,13 +7,17 @@ Here's how to use Matahari:
 
     Router::register(array('GET /', 'GET /home'), function()
     {
-        $matahari = new Matahari;
-        $matahari->spy('test-marker', array(1,2,3,4));
-        $matahari->spy('test-marker', array(5,6,7,8));
-        $matahari->spy('test-marker2', array('key' => 'test'));
-        $output = $matahari->spit();
-        return View::make('view.index')->with('output', $output);
+        Matahari::spy('test-marker', array(1,2,3,4));
+        Matahari::spy('test-marker', array(5,6,7,8));
+        Matahari::spy('test-marker2', array('key' => 'test'));
+
+        return View::make('intro.index')->with('output', Matahari::spit());
     });
+
+    
+Notice
+=======
+This bundle is still under development!
 
 
 Output
