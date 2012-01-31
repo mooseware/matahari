@@ -4,12 +4,13 @@ class Matahari {
 
 	const VERSION = '0.2.0';
 	
-	private static $always_show_request_array = true;
-	private static $always_show_session_array = false;
+	private static $dump_request 	= false; // dump $_REQUEST array
+	private static $dump_session 	= false; // dump $_SESSION array
+	private static $_date			= date('Y-m-d H:i:s');
 
-	private static $markers 	= array();
-	private static $meta 		= array();
-	private static $time 		= '';
+	private static $markers 		= array();
+	private static $meta 			= array();
+	private static $time 			= '';
 
 	final private function __construct() {}
 	
@@ -25,7 +26,7 @@ class Matahari {
 			static::$time['start'] = microtime(true);
 		}
 
-		$message = '<span class="date_field">set at <em>'.date('Y-m-d H:i:s').'</em></span><br><span class="message">'.static::pre(print_r($marker, true)).'</span><br><span class="meta_field">'.$meta.'</span>';
+		$message = '<span class="date_field">set at <em>'.static::$_date.'</em></span><br><span class="message">'.static::pre(print_r($marker, true)).'</span><br><span class="meta_field">'.$meta.'</span>';
 		
 		if (is_array(static::$markers[$marker_name])) {
 			array_push(static::$markers[$marker_name], $marker);
@@ -43,8 +44,8 @@ class Matahari {
 		static::$time['end'] = microtime(true);
 
 		$script_duration = number_format(static::$time['end'] - static::$time['start'], 6, ',', '.');
-		if (static::$always_show_request_array) static::$meta['$_REQUEST'] = static::pre(print_r($_REQUEST, true));
-		if (static::$always_show_session_array) static::$meta['$_SESSION'] = static::pre(print_r($_SESSION, true));
+		if (static::$dump_request) static::$meta['$_REQUEST'] = static::pre(print_r($_REQUEST, true));
+		if (static::$dump_session) static::$meta['$_SESSION'] = static::pre(print_r($_SESSION, true));
 		
 		$html = '';
 		$html.= static::css();
