@@ -23,7 +23,7 @@ class Matahari {
 	 * @param string 	$meta
 	 */
 	public function spy($marker_name, $message = '', $meta = '') {
-		$message = '<span class="date_field">set at <em>'.date('Y-m-d H:i:s').'</em></span><br><span class="message">'.$this->pre(print_r($message, true)).'</span><br><span class="meta_field">'.$meta.'</span>';
+		$message = '<span class="date_field">set at <em>' . date('Y-m-d H:i:s') . '</em></span><br><span class="message">' . $this->pre(print_r($message, true)) . '</span><br><span class="meta_field">' . $meta . '</span>';
 		
 		if (is_array($this->markers[$marker_name])) {
 			array_push($this->markers[$marker_name], $message);
@@ -50,9 +50,9 @@ class Matahari {
 		$html.= '<div id="mata_hari_keys">';
 		
 		// Spy marker header list
-		$html.= '<div class="mata_hari_keys_list"><h1>'.$title.'</h1><ul>';
+		$html.= '<div class="mata_hari_keys_list"><h1>Markers:</h1><ul>';
 		foreach ($this->markers as $key => $value) {
-			$html.= '<li><a href="#'.md5($key).'">'.$key.' ('.count($value).')'.'</a></li>';
+			$html.= '<li><a href="#' . md5($key) . '">' . $key . ' (' . count($value) . ')' . '</a></li>';
 		}
 		$html.= '</ul></div>';
 		
@@ -63,12 +63,12 @@ class Matahari {
 		$html.= '</ul></div>';
 		
 		// Dump markers and meta info
-		$html.= '</div><br style="clear: both;" />';
+		$html.= '</div><br style="clear: both;" /><br />';
 		$html.= '<div id="mata_hari_values">';
 		
 		// Markers
 		foreach ($this->markers as $key => $value) {
-			$html.= $this->dump_marker($key, $value);
+			$html.= $this->dump_marker($key, $value).'<br />';
 		}
 		
 		// Meta info
@@ -90,10 +90,10 @@ class Matahari {
 	 * @return string
 	 */
 	private function dump_marker($title, $marker) {
-		$html = '<div id="'.md5($title).'" class="spy-marker"><h1>Spy Marker: '.$title.'</h1><div>';
+		$html = '<div id="' . md5($title) . '" class="spy-marker"><h1>Spy Marker: ' . $title . '</h1><div>';
 		
 		foreach ($marker as $key => $value) {
-			$html.= $value . '<br /><br />';
+			$html.= $value;
 		}
 		$html.= '</div></div>';
 		
@@ -108,7 +108,7 @@ class Matahari {
 	 * @return string
 	 */
 	private function make_meta_list($title, $array) {
-		$html = '<div id="'.md5($title).'"><h1>Meta Info: '.$title.'</h1>';
+		$html = '<div id="' . md5($title) . '"><h1>Meta Info: ' . $title . '</h1>';
 		// get the print_r info into the var
 		$html.= print_r($array, true);
 		$html.= '</div>';
@@ -211,7 +211,7 @@ class Matahari {
 	 * @return string
 	 */
 	private function pre($string) {
-		return '<pre>'.$string.'</pre>';
+		return '<pre>' . $string . '</pre>';
 	}
 
 }

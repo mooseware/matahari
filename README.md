@@ -14,3 +14,8 @@ Here's how to use Matahari:
         $output = $matahari->spit();
         return View::make('view.index')->with('output', $output);
     });
+
+
+Output
+=======
+![Matahari Screenshot](https://github.com/mooseware/matahari/raw/master/screenshots/matahari.png)
