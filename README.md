@@ -33,7 +33,7 @@ This bundle is still under development!
 
 Output (example)
 =================
-![Matahari Screenshot](https://github.com/mooseware/matahari/raw/master/screenshots/v0.4.png)
+![Matahari Screenshot](https://github.com/mooseware/matahari/raw/master/screenshots/v04.png)
 
 
 More 2 come
