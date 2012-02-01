@@ -4,120 +4,143 @@ class Matahari {
 
 	const VERSION = '0.3.1';
 	
-	private static $dump_request 	= false; 
-	private static $dump_session 	= false;
-	
-	private static $markers 		= array();
-	private static $meta 			= array();
-	private static $time 			= '';
+	private static $_instance = null;
+	private static $_result = '';
+	private static $_stack = array();
+	private static $_config = array();
+	private static $start = '';
+	private static $end = '';
 
-	final private function __construct() {}
-	
-	/**
-	 * Spy at marker
-	 *
-	 * @param mixed 	$marker
-	 * @param string 	$marker_name
-	 * @param string 	$meta
-	 */
-	public static function spy($marker, $marker_name = '', $meta = '') {
-		if (! isset(static::$time['Script Start'])) {
-			static::$time['start'] = microtime(true);
-		}
 
-		$message = '<span class="date_field">set at <em>'.date('Y-m-d H:i:s').'</em></span><br><span class="message">'.static::pre(print_r($marker, true)).'</span><br><span class="meta_field">'.$meta.'</span>';
-		
-		if (is_array(static::$markers[$marker_name])) {
-			array_push(static::$markers[$marker_name], $message);
-		} else {
-			static::$markers[$marker_name] = array($message);
+	public static function init($config = array()) {
+		if ( ! static::instance()) {
+			static::$_instance = new static;
+			static::$start = microtime(true);
+
+			return static::$_instance;
 		}
 	}
-	
+
 	/**
-	 * Shows the gathered results in a nice div
+	 * Set a time marker
 	 *
-	 * @return string
+	 * @param string	$name
 	 */
+	public static function mark($name = '') {
+		if ( ! static::instance()) static::init();
+
+		$item = array(
+			'type' => 'mark',
+			'time' => microtime(true),
+			'name' => $name
+		);
+		static::$_stack[] = $item;
+	}
+
+	/**
+	 * Set a memory marker
+	 *
+	 * @param string	$name
+	 */
+	public static function memory($name = '') {
+		if ( ! static::instance()) static::init();
+
+		$item = array(
+			'type' => 'memory',
+			'memory' => memory_get_usage(),
+			'name' => $name
+		);
+		static::$_stack[] = $item;
+	}
+
+	public static function spy($element, $name = '') {
+		if ( ! static::instance()) static::init();
+
+		$item = array(
+			'type' => 'spy',
+			'name' => $name,
+			'content' => print_r($element, true),
+		);
+		static::$_stack[] = $item;
+	}
+
 	public static function spit() {
-		static::$time['end'] = microtime(true);
+		static::$end = microtime(true);
 
-		$script_duration = number_format(static::$time['end'] - static::$time['start'], 6, ',', '.');
-		if (static::$dump_request) static::$meta['$_REQUEST'] = static::pre(print_r($_REQUEST, true));
-		if (static::$dump_session) static::$meta['$_SESSION'] = static::pre(print_r($_SESSION, true));
-		
-		$html = '';
-		$html.= static::css();
-		$html.= '<div id="mata_hari_debug"><div id="title">Mata Hari - exotic espionage for PHP</div>';
-		$html.= '<div id="mata_hari_keys">';
-		
-		// Spy marker header list
-		$html.= '<div class="mata_hari_keys_list"><h1>Markers:</h1><ul>';
-		foreach (static::$markers as $key => $value) {
-			$html.= '<li><a href="#'.md5($key).'">'.$key.' ('.count($value).')'.'</a></li>';
+		if ( ! static::instance()) static::init();
+
+		static::$_result = static::html('header');
+		$time_diff = static::$end - static::$start;
+		static::$_result.= '<div class="meta-info">';
+		static::$_result.= 'Total Execution Time: <span class="time">'.round($time_diff, 4).' s</span>';
+		static::$_result.= '<br />Total Consumed Memory: <span class="time">'.round(memory_get_usage() / pow(1024, 2), 3).' MB</span>';
+		static::$_result.= '</div>';
+
+		$i = 1;
+		$odd_even = 'even';
+		foreach (static::$_stack as $item) {
+			switch ($item['type']) {
+				case 'mark':
+					if ($item['name'] == '') {
+						$item['name'] = '#'.$i;
+					}
+					$time_diff = $item['time'] - static::$start;
+					static::$_result.= '<div class="spy-marker-time '.$odd_even.'">Time from start to marker <span class="marker-name">'.$item['name'].'</span>: <span class="time">'.round($time_diff, 4).' s</span></div>';
+					break;
+				
+				case 'spy':
+					if ($item['name'] == '') {
+						$item['name'] = $i;
+					}
+					static::$_result.= '<div class="spy-marker '.$odd_even.'">Dump of marker <span class="marker-name">'.$item['name'].'</span>'.static::pre($item['content']).'</div>';
+					break;
+
+				case 'memory':
+					if ($item['name'] == '') {
+						$item['name'] = '#'.$i;
+					}
+					static::$_result.= '<div class="spy-marker-time '.$odd_even.'">Memory consumed at marker <span class="marker-name">'.$item['name'].'</span></em>: <span class="time">'.round($item['memory'] / pow(1024, 2), 3).' MB</span></div>';
+					break;
+			}
+
+			$i++;
+			($odd_even == 'even') ? $odd_even = 'odd' : $odd_even = 'even';
 		}
-		$html.= '</ul></div>';
-		
-		// General info header list
-		$html.= '<div class="mata_hari_keys_list"><h1>General Info</h1><ul>';
-		$html.= '<li>File: '.$_SERVER['PHP_SELF'].'</li>';
-		$html.= '<li>Script Duration: '.$script_duration.'</li>';
-		$html.= '</ul></div>';
-		
-		// Dump markers and meta info
-		$html.= '</div><br style="clear: both;" /><br />';
-		$html.= '<div id="mata_hari_values">';
-		
-		// Markers
-		foreach (static::$markers as $key => $value) {
-			$html.= static::dump_marker($key, $value).'<br />';
-		}
-		
-		// Meta info
-		foreach (static::$meta as $key => $value) {
-			$html.= static::make_meta_list($key, $value);
-		}
-		
-		$html.= '</div><br style="clear: both;" />';
-		$html.= '</div>';
-		
-		return $html;
+		static::$_result.= static::html('footer');
+
+		return static::$_instance;
 	}
 
-	/**
-	 * Dumps a marker
-	 *
-	 * @param string $title
-	 * @param array $marker
-	 * @return string
-	 */
-	private static function dump_marker($title, $marker) {
-		$html = '<div id="'.md5($title).'" class="spy-marker"><h1>Spy Marker: '.$title.'</h1><div>';
-		
-		foreach ($marker as $key => $value) {
-			$html.= $value;
-		}
-		$html.= '</div></div>';
-		
-		return $html;
-	}	
-	
-	/**
-	 * Creates meta info list
-	 *
-	 * @param string $title
-	 * @param mixed $array
-	 * @return string
-	 */
-	private static function make_meta_list($title, $array) {
-		$html = '<div id="'.md5($title).'"><h1>Meta Info: '.$title.'</h1>';
-		// get the print_r info into the var
-		$html.= print_r($array, true);
-		$html.= '</div>';
-		
-		return $html;
+	public function to_board() {
+		return static::$_result;
 	}
-	
+
+	public function to_file($path) {
+
+	}
+
+	private static function instance() {
+		return ( ! is_null(static::$_instance));
+	}
+
+	private static function html($type) {
+		switch ($type) {
+			case 'header':
+				return 
+					static::css() . '
+					<div id="mata_hari_debug">
+						<div id="title">Mata Hari - exotic espionage for PHP</div>
+						<div id="mata_hari_values">';
+				break;
+			
+			case 'footer':
+				return 
+					'</div>
+					<br style="clear: both;" />
+				</div>';
+		}
+	}
+
 	/**
 	 * Return CSS for output
 	 *
@@ -132,10 +155,8 @@ class Matahari {
 				width: 85%;
 				height: 700px;
 				margin: auto;
-				padding: 10px;
-				padding-right: 0px;
-				background-color: #000;
-				color: #fff;
+				background-color: #141414;
+				color: #e2e2e2;
 				border: 5px solid #ccc;
 				text-align: left;
 				overflow: auto;
@@ -144,8 +165,6 @@ class Matahari {
 			#mata_hari_debug #title {
 				display: block;
 				width: 100%;
-				margin: -10px;
-				margin-bottom: 20px;
 				padding: 5px;
 				background-color: #ccc;
 				color: #f00;
@@ -153,59 +172,41 @@ class Matahari {
 				font-weight: bold;
 				clear: both;
 			}
-			
-			#mata_hari_debug .date_field, #mata_hari_debug .meta_field {
-				font-size: 12px;
-				
-			}
-			
-			#mata_hari_debug .date_field {
-				color: #6AD0F7;
-			}
-
-			#mata_hari_debug .meta_field {
-				color: #509129;
-			}
-			
-			pre {
-				background-color: #282828;
-				font-size: 12px;
-				color: #ccc;
-			}
-			
-			#mata_hari_debug a {
-				color: #fff;
-				text-decoration: none;
-			}
-			
-			#mata_hari_debug h1 {
-				font-size: 16px;
-				color: #ccc;
-			}
-			
-			#mata_hari_keys {
-				clear: both;
-			}
-			
-			#mata_hari_values {
-			}
-			
-			.mata_hari_keys_list {
-				float: left;
-				margin: 0 15px 0 0;
-				width: 250px;
-			}
 			.spy-marker {
-				padding-right: 5px;
+				padding: 5px;
+				border-bottom: 1px solid #3d3d3d;
 			}
-			.spy-marker h1 {
-				margin-bottom: 0;
-				line-height: 16px;
+			.spy-marker-time {
+				padding: 5px;
+				border-bottom: 1px solid #3d3d3d;
+				padding-bottom: 10px;
+				padding-top: 10px;
+			}
+			.time {
+				color: #ffe13d;
+			}
+			.marker-name {
+				color: #7eaccc;
+			}
+			.even {
+
+			}
+			.odd {
+				background-color: #282828;
+			}
+			.meta-info {
+				font-weight: bold;
+				padding: 5px;
+				padding-top: 10px;
+				padding-bottom: 10px;
+				margin-bottom: 20px;
+				border-bottom: 1px dashed #3d3d3d;
+				line-height: 20px;
 			}
 		</style>
 		';
 	}
-	
+
 	/**
 	 * Helper function to wrap the string in <pre> tags
 	 *
