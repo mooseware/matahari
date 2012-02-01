@@ -11,7 +11,12 @@ class Matahari {
 	private static $start = '';
 	private static $end = '';
 
-
+	/**
+	 * Instantiation
+	 *
+	 * @param array 	$config 	// not yet used!
+	 * @return object
+	 */
 	public static function init($config = array()) {
 		if ( ! static::instance()) {
 			static::$_instance = new static;
@@ -22,7 +27,7 @@ class Matahari {
 	}
 
 	/**
-	 * Set a time marker
+	 * Sets a time marker
 	 *
 	 * @param string	$name
 	 */
@@ -38,7 +43,7 @@ class Matahari {
 	}
 
 	/**
-	 * Set a memory marker
+	 * Sets a memory marker
 	 *
 	 * @param string	$name
 	 */
@@ -53,6 +58,12 @@ class Matahari {
 		static::$_stack[] = $item;
 	}
 
+	/**
+	 * Spies on an element
+	 * 
+	 * @param mixed 	$element
+	 * @param string 	$name
+	 */
 	public static function spy($element, $name = '') {
 		if ( ! static::instance()) static::init();
 
@@ -64,6 +75,11 @@ class Matahari {
 		static::$_stack[] = $item;
 	}
 
+	/**
+	 * Forges the output
+	 * 
+	 * @return object 	// for method chaining
+	 */
 	public static function spit() {
 		static::$end = microtime(true);
 
@@ -111,18 +127,37 @@ class Matahari {
 		return static::$_instance;
 	}
 
+	/**
+	 * Returns the result for later use
+	 *
+	 * @return string
+	 */
 	public function to_board() {
 		return static::$_result;
 	}
 
-	public function to_file($path) {
+	/**
+	 * Strems result into a file
+	 * 
+	 * @todo: write method!
+	 */
+	public function to_file($path) {}
 
-	}
-
+	/**
+	 * Checks if instance has been created
+	 *
+	 * @return bool
+	 */
 	private static function instance() {
 		return ( ! is_null(static::$_instance));
 	}
 
+	/**
+	 * Returns some HTML structures
+	 * 
+	 * @param string 	$type
+	 * @return string
+	 */
 	private static function html($type) {
 		switch ($type) {
 			case 'header':
@@ -142,7 +177,7 @@ class Matahari {
 	}
 
 	/**
-	 * Return CSS for output
+	 * Returns CSS for output
 	 *
 	 * @return string
 	 */
