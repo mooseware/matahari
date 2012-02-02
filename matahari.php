@@ -57,7 +57,7 @@ class Matahari {
 			'memory' => memory_get_usage(),
 			'name' => $name
 		);
-		
+
 		static::$_stack[] = $item;
 	}
 
@@ -152,33 +152,25 @@ class Matahari {
 		$i = 1;
 		$odd_even = 'even';
 		foreach (static::$_stack as $item) {
+			if ($item['name'] == '') {
+				$item['name'] = '#'.$i;
+			}
+
 			switch ($item['type']) {
 				case 'marker':
-					if ($item['name'] == '') {
-						$item['name'] = '#'.$i;
-					}
 					$time_diff = $item['time'] - static::$start;
 					static::$_result.= '<div class="spy-marker-time '.$odd_even.'">Marked <span class="marker-name">"'.$item['name'].'"</span> [ <span class="time">'.round($time_diff, 4).'s</span> <span class="memory">'.round($item['memory'] / pow(1024, 2), 3).'Mb</span> ]</div>';
 					break;
 
 				case 'look':
-					if ($item['name'] == '') {
-						$item['name'] = '#'.$i;
-					}
 					static::$_result.= '<div class="spy-marker '.$odd_even.'">Look at <span class="marker-name">"'.$item['name'].'"</span> [ <span class="time">'.$item['time_diff'].'s</span> <span class="memory">'.round($item['current_memory'] / pow(1024, 2), 3).'Mb</span> (<span class="memory">'.$item['memory_diff'].'Mb</span>) ]</div>';
 					break;
 				
 				case 'spy':
-					if ($item['name'] == '') {
-						$item['name'] = $i;
-					}
 					static::$_result.= '<div class="spy-marker '.$odd_even.'">Spying on <span class="marker-name">"'.$item['name'].'"</span>'.static::pre($item['content']).'</div>';
 					break;
 
 				case 'memory':
-					if ($item['name'] == '') {
-						$item['name'] = '#'.$i;
-					}
 					static::$_result.= '<div class="spy-marker-time '.$odd_even.'">Memory consumed at marker <span class="marker-name">'.$item['name'].'</span></em>: <span class="time">'.round($item['memory'] / pow(1024, 2), 3).'Mb</span></div>';
 					break;
 			}
