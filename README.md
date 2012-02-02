@@ -1,7 +1,7 @@
 Matahari Bundle for the Laravel Framework
 =======================================
 
-This bundle enables nicer debugging by spying on vars while a script executes. All markers can be spit out together at the end of the espionage. Markers with the same name are being grouped.
+This bundle enables nicer debugging by spying on vars while a script executes. You could also set time- or memory-marker to see, which time it took to get from start to the specified time-marker, or how much memory is being consumed on a certain point. All markers can be printed out at the end of the espionage.
 
 Here's how to use Matahari:
 
@@ -28,7 +28,13 @@ Here's how to use Matahari:
     
 Notice
 =======
-This bundle is still under development!
+**This bundle is still under development!**
+
+
+Requirements
+=============
+- PHP 5.3+
+- Laravel PHP 3.0+
 
 
 Output (example)
