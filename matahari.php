@@ -137,7 +137,7 @@ class Matahari {
 	}
 
 	/**
-	 * Strems result into a file
+	 * Streams result into a file
 	 * 
 	 * @todo: write method!
 	 */
