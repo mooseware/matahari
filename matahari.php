@@ -103,7 +103,7 @@ class Matahari
 		}
 		catch (\Exception $e)
 		{
-			// could be changed to write to lof file or so...
+			// could be changed to write to log file or so...
 			return false;
 		}
 
