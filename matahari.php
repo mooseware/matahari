@@ -1,6 +1,7 @@
 <?php namespace Matahari;
 
-class Matahari {
+class Matahari
+{
 
 	const VERSION = '0.4.0';
 	
@@ -17,8 +18,10 @@ class Matahari {
 	 * @param array 	$config 	// not yet used!
 	 * @return object
 	 */
-	public static function init($config = array()) {
-		if ( ! static::instance()) {
+	public static function init($config = array())
+	{
+		if ( ! static::instance())
+		{
 			static::$_instance = new static;
 			static::$start = microtime(true);
 
@@ -31,7 +34,8 @@ class Matahari {
 	 *
 	 * @param string	$name
 	 */
-	public static function mark($name = '') {
+	public static function mark($name = '')
+	{
 		if ( ! static::instance()) static::init();
 
 		$item = array(
@@ -49,7 +53,8 @@ class Matahari {
 	 *
 	 * @param string	$name
 	 */
-	public static function memory($name = '') {
+	public static function memory($name = '')
+	{
 		if ( ! static::instance()) static::init();
 
 		$item = array(
@@ -67,7 +72,8 @@ class Matahari {
 	 * @param mixed 	$element
 	 * @param string 	$name
 	 */
-	public static function spy($element, $name = '') {
+	public static function spy($element, $name = '')
+	{
 		if ( ! static::instance()) static::init();
 
 		$item = array(
@@ -84,19 +90,22 @@ class Matahari {
 	 * 
 	 * @param string	$marker_name
 	 */
-	public static function look($marker_name = '') {
+	public static function look($marker_name = '')
+	{
 		if ( ! static::instance()) static::init();
 
 		$current_time = microtime(true);
 		$current_memory = memory_get_usage();
 		$marker = static::find_marker($marker_name);
 
-		if (is_int($marker)) {
+		if (is_int($marker))
+		{
 			$marker_values = static::$_stack[$marker];
 			$time_diff = $current_time - $marker_values['time'];
 			$memory_diff = round(($current_memory - $marker_values['memory']) / pow(1024, 2), 3);
 
-			if (substr($memory_diff, 0, 1) != '-') {
+			if (substr($memory_diff, 0, 1) != '-')
+			{
 				$memory_diff = "+".$memory_diff;
 			}
 		}
@@ -118,9 +127,12 @@ class Matahari {
 	 * @param string	$marker_name
 	 * @return integer	$key
 	 */
-	private static function find_marker($marker_name) {
-		foreach (static::$_stack as $key => $item) {
-			if ($item['type'] == 'marker' and $item['name'] == $marker_name) {
+	private static function find_marker($marker_name)
+	{
+		foreach (static::$_stack as $key => $item)
+		{
+			if ($item['type'] == 'marker' and $item['name'] == $marker_name)
+			{
 				// we cannot return the first matched key here as we wish to
 				// always get the latest key of the marker returned.
 				// Marker can repeat themselves but should be displayed
@@ -137,7 +149,8 @@ class Matahari {
 	 * 
 	 * @return object 	// for method chaining
 	 */
-	public static function spit() {
+	public static function spit()
+	{
 		static::$end = microtime(true);
 
 		if ( ! static::instance()) static::init();
@@ -151,12 +164,15 @@ class Matahari {
 
 		$i = 1;
 		$odd_even = 'even';
-		foreach (static::$_stack as $item) {
-			if ($item['name'] == '') {
+		foreach (static::$_stack as $item)
+		{
+			if ($item['name'] == '')
+			{
 				$item['name'] = '#'.$i;
 			}
 
-			switch ($item['type']) {
+			switch ($item['type'])
+			{
 				case 'marker':
 					$time_diff = $item['time'] - static::$start;
 					static::$_result.= '<div class="spy-marker-time '.$odd_even.'">Marked <span class="marker-name">"'.$item['name'].'"</span> [ <span class="time">'.round($time_diff, 4).'s</span> <span class="memory">'.round($item['memory'] / pow(1024, 2), 3).'Mb</span> ]</div>';
@@ -188,7 +204,8 @@ class Matahari {
 	 *
 	 * @return string
 	 */
-	public function to_board() {
+	public function to_board()
+	{
 		return static::$_result;
 	}
 
@@ -204,7 +221,8 @@ class Matahari {
 	 *
 	 * @return bool
 	 */
-	private static function instance() {
+	private static function instance()
+	{
 		return ( ! is_null(static::$_instance));
 	}
 
@@ -214,8 +232,10 @@ class Matahari {
 	 * @param string 	$type
 	 * @return string
 	 */
-	private static function html($type) {
-		switch ($type) {
+	private static function html($type)
+	{
+		switch ($type)
+		{
 			case 'header':
 				return 
 					static::css() . '
@@ -237,7 +257,8 @@ class Matahari {
 	 *
 	 * @return string
 	 */
-	private static function css() {
+	private static function css()
+	{
 		return '
 		<style>
 			#mata_hari_debug {
@@ -307,7 +328,8 @@ class Matahari {
 	 * @param string $string
 	 * @return string
 	 */
-	private static function pre($string) {
+	private static function pre($string)
+	{
 		return '<pre>'.$string.'</pre>';
 	}
 
