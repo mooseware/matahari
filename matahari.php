@@ -96,7 +96,16 @@ class Matahari
 
 		$current_time = microtime(true);
 		$current_memory = memory_get_usage();
-		$marker = static::find_marker($marker_name);
+		
+		try
+		{
+			$marker = static::find_marker($marker_name);
+		}
+		catch (\Exception $e)
+		{
+			// could be changed to write to lof file or so...
+			return false;
+		}
 
 		if (is_int($marker))
 		{
@@ -128,7 +137,8 @@ class Matahari
 	 * @return integer	$key
 	 */
 	private static function find_marker($marker_name)
-	{
+	{	
+		$return = false;
 		foreach (static::$_stack as $key => $item)
 		{
 			if ($item['type'] == 'marker' and $item['name'] == $marker_name)
@@ -139,6 +149,11 @@ class Matahari
 				// as if they have been reset!
 				$return = $key;
 			}
+		}
+		
+		if ($return === false)
+		{
+			throw new \Exception("Marker name is eiter empty or cannot be found!");
 		}
 
 		return $return;
@@ -172,12 +187,11 @@ class Matahari
 			}
 
 			static::$_result.=  '<div class="spy-marker-time '.$odd_even.'">';
-
 			switch ($item['type'])
 			{
 				case 'marker':
 					static::$_result.= sprintf(
-						'Marked <span class="marker-name">"%s</span> [ <span class="time">%ss</span> <span class="memory">%sMb</span> ]', 
+						'Marked <span class="marker-name">%s</span> [ <span class="time">%ss</span> <span class="memory">%sMb</span> ]', 
 						$item['name'], 
 						round(($item['time'] - static::$start), 4), 
 						round($item['memory'] / pow(1024, 2), 3)
@@ -210,12 +224,12 @@ class Matahari
 					);
 					break;
 			}
-
 			static::$_result.= '</div>';
 
 			$i++;
 			($odd_even == 'even') ? $odd_even = 'odd' : $odd_even = 'even';
 		}
+
 		static::$_result.= static::html('footer');
 
 		return static::$_instance;
