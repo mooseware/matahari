@@ -171,25 +171,47 @@ class Matahari
 				$item['name'] = '#'.$i;
 			}
 
+			static::$_result.=  '<div class="spy-marker-time '.$odd_even.'">';
+
 			switch ($item['type'])
 			{
 				case 'marker':
-					$time_diff = $item['time'] - static::$start;
-					static::$_result.= '<div class="spy-marker-time '.$odd_even.'">Marked <span class="marker-name">"'.$item['name'].'"</span> [ <span class="time">'.round($time_diff, 4).'s</span> <span class="memory">'.round($item['memory'] / pow(1024, 2), 3).'Mb</span> ]</div>';
+					static::$_result.= sprintf(
+						'Marked <span class="marker-name">"%s</span> [ <span class="time">%ss</span> <span class="memory">%sMb</span> ]', 
+						$item['name'], 
+						round(($item['time'] - static::$start), 4), 
+						round($item['memory'] / pow(1024, 2), 3)
+					);
 					break;
 
 				case 'look':
-					static::$_result.= '<div class="spy-marker '.$odd_even.'">Look at <span class="marker-name">"'.$item['name'].'"</span> [ <span class="time">'.$item['time_diff'].'s</span> <span class="memory">'.round($item['current_memory'] / pow(1024, 2), 3).'Mb</span> (<span class="memory">'.$item['memory_diff'].'Mb</span>) ]</div>';
+					static::$_result.= sprintf(
+						'Look at <span class="marker-name">%s</span> [ <span class="time">%ss</span> <span class="memory">%sMb</span> (<span class="memory">%sMb</span>) ]',
+						$item['name'],
+						$item['time_diff'],
+						round($item['current_memory'] / pow(1024, 2), 3),
+						$item['memory_diff']
+					);
 					break;
 				
 				case 'spy':
-					static::$_result.= '<div class="spy-marker '.$odd_even.'">Spying on <span class="marker-name">"'.$item['name'].'"</span>'.static::pre($item['content']).'</div>';
+					static::$_result.= sprintf(
+						'Spying on <span class="marker-name">%s</span>%s',
+						$item['name'],
+						static::pre($item['content'])
+					);
 					break;
 
 				case 'memory':
-					static::$_result.= '<div class="spy-marker-time '.$odd_even.'">Memory consumed at marker <span class="marker-name">'.$item['name'].'</span></em>: <span class="time">'.round($item['memory'] / pow(1024, 2), 3).'Mb</span></div>';
+					static::$_result.= sprintf(
+						'Memory consumed at marker <span class="marker-name">%s</span></em>: <span class="time">%sMb</span>',
+						$item['name'],
+						round($item['memory'] / pow(1024, 2), 3)
+					);
 					break;
 			}
+
+			static::$_result.= '</div>';
 
 			$i++;
 			($odd_even == 'even') ? $odd_even = 'odd' : $odd_even = 'even';
