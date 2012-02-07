@@ -51,7 +51,7 @@ Requirements
 
 Output (example)
 =================
-![Matahari Screenshot](https://github.com/mooseware/matahari/raw/master/screenshots/screenshot.png)
+![Matahari Screenshot](https://github.com/mooseware/matahari/raw/develop/screenshots/screenshot.png)
 
 
 More 2 come
