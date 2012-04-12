@@ -1,15 +1,16 @@
-<?php namespace Matahari;
+<?php
 
-class Matahari {
+class Matahari
+{
 
-	const VERSION = '0.4.0';
+	const VERSION = '0.4.1';
 	
 	private static $_instance = null;
-	private static $_result = '';
+	private static $_result = array();
 	private static $_stack = array();
 	private static $_config = array();
-	private static $start = '';
-	private static $end = '';
+	public static $start = '';
+	public static $end = '';
 
 	/**
 	 * Instantiation
@@ -17,8 +18,10 @@ class Matahari {
 	 * @param array 	$config 	// not yet used!
 	 * @return object
 	 */
-	public static function init($config = array()) {
-		if ( ! static::instance()) {
+	public static function init($config = array())
+	{
+		if ( ! static::instance())
+		{
 			static::$_instance = new static;
 			static::$start = microtime(true);
 
@@ -31,14 +34,17 @@ class Matahari {
 	 *
 	 * @param string	$name
 	 */
-	public static function mark($name = '') {
+	public static function mark($name = '')
+	{
 		if ( ! static::instance()) static::init();
 
 		$item = array(
-			'type' => 'mark',
+			'type' => 'marker',
 			'time' => microtime(true),
+			'memory' => memory_get_usage(),
 			'name' => $name
 		);
+		
 		static::$_stack[] = $item;
 	}
 
@@ -47,7 +53,8 @@ class Matahari {
 	 *
 	 * @param string	$name
 	 */
-	public static function memory($name = '') {
+	public static function memory($name = '')
+	{
 		if ( ! static::instance()) static::init();
 
 		$item = array(
@@ -55,6 +62,7 @@ class Matahari {
 			'memory' => memory_get_usage(),
 			'name' => $name
 		);
+
 		static::$_stack[] = $item;
 	}
 
@@ -64,7 +72,8 @@ class Matahari {
 	 * @param mixed 	$element
 	 * @param string 	$name
 	 */
-	public static function spy($element, $name = '') {
+	public static function spy($element, $name = '')
+	{
 		if ( ! static::instance()) static::init();
 
 		$item = array(
@@ -72,7 +81,82 @@ class Matahari {
 			'name' => $name,
 			'content' => print_r($element, true),
 		);
+
 		static::$_stack[] = $item;
+	}
+
+	/**
+	 * Shows an actual information, mostly differences, to a marker
+	 * 
+	 * @param string	$marker_name
+	 */
+	public static function look($marker_name = '')
+	{
+		if ( ! static::instance()) static::init();
+
+		$current_time = microtime(true);
+		$current_memory = memory_get_usage();
+		
+		try
+		{
+			$marker = static::find_marker($marker_name);
+		}
+		catch (\Exception $e)
+		{
+			// could be changed to write to log file or so...
+			return false;
+		}
+
+		if (is_int($marker))
+		{
+			$marker_values = static::$_stack[$marker];
+			$time_diff = $current_time - $marker_values['time'];
+			$memory_diff = round(($current_memory - $marker_values['memory']) / pow(1024, 2), 3);
+
+			if (substr($memory_diff, 0, 1) != '-')
+			{
+				$memory_diff = "+".$memory_diff;
+			}
+		}
+
+		$item = array(
+			'type' => 'look',
+			'current_memory' => $current_memory,
+			'time_diff' => round($time_diff, 4),
+			'memory_diff' => $memory_diff,
+			'name' => $marker_name,
+		);
+
+		static::$_stack[] = $item;
+	}
+
+	/**
+	 * Checks if a marker has already been set and returns the latest key of it
+	 * 
+	 * @param string	$marker_name
+	 * @return integer	$key
+	 */
+	private static function find_marker($marker_name)
+	{	
+		$return = false;
+		foreach (static::$_stack as $key => $item)
+		{
+			if ($item['type'] == 'marker' and $item['name'] == $marker_name)
+			{
+				// we cannot return the first matched key here as we wish to
+				// always get the latest key of the marker returned.
+				// Marker can repeat themselves but should be displayed
+				// as if they have been reset!
+				$return = $key;
+			}
+		}
+		
+		if ($return === false)
+		{
+			throw new \Exception("Marker name is eiter empty or cannot be found!");
+		}
+
+		return $return;
 	}
 
 	/**
@@ -80,49 +164,15 @@ class Matahari {
 	 * 
 	 * @return object 	// for method chaining
 	 */
-	public static function spit() {
+	public static function spit()
+	{
 		static::$end = microtime(true);
 
 		if ( ! static::instance()) static::init();
 
-		static::$_result = static::html('header');
-		$time_diff = static::$end - static::$start;
-		static::$_result.= '<div class="meta-info">';
-		static::$_result.= 'Total Execution Time: <span class="time">'.round($time_diff, 4).' s</span>';
-		static::$_result.= '<br />Total Consumed Memory: <span class="time">'.round(memory_get_usage() / pow(1024, 2), 3).' MB</span>';
-		static::$_result.= '</div>';
-
-		$i = 1;
-		$odd_even = 'even';
-		foreach (static::$_stack as $item) {
-			switch ($item['type']) {
-				case 'mark':
-					if ($item['name'] == '') {
-						$item['name'] = '#'.$i;
-					}
-					$time_diff = $item['time'] - static::$start;
-					static::$_result.= '<div class="spy-marker-time '.$odd_even.'">Time from start to marker <span class="marker-name">'.$item['name'].'</span>: <span class="time">'.round($time_diff, 4).' s</span></div>';
-					break;
-				
-				case 'spy':
-					if ($item['name'] == '') {
-						$item['name'] = $i;
-					}
-					static::$_result.= '<div class="spy-marker '.$odd_even.'">Dump of marker <span class="marker-name">'.$item['name'].'</span>'.static::pre($item['content']).'</div>';
-					break;
-
-				case 'memory':
-					if ($item['name'] == '') {
-						$item['name'] = '#'.$i;
-					}
-					static::$_result.= '<div class="spy-marker-time '.$odd_even.'">Memory consumed at marker <span class="marker-name">'.$item['name'].'</span></em>: <span class="time">'.round($item['memory'] / pow(1024, 2), 3).' MB</span></div>';
-					break;
-			}
-
-			$i++;
-			($odd_even == 'even') ? $odd_even = 'odd' : $odd_even = 'even';
-		}
-		static::$_result.= static::html('footer');
+		static::$_result['total_time'] = round((static::$end - static::$start), 4);
+		static::$_result['total_memory'] = round(memory_get_usage() / pow(1024, 2), 3);
+		static::$_result['items'] = static::$_stack;
 
 		return static::$_instance;
 	}
@@ -132,12 +182,13 @@ class Matahari {
 	 *
 	 * @return string
 	 */
-	public function to_board() {
+	public function to_board()
+	{
 		return static::$_result;
 	}
 
 	/**
-	 * Strems result into a file
+	 * Streams result into a file
 	 * 
 	 * @todo: write method!
 	 */
@@ -148,108 +199,9 @@ class Matahari {
 	 *
 	 * @return bool
 	 */
-	private static function instance() {
+	private static function instance()
+	{
 		return ( ! is_null(static::$_instance));
-	}
-
-	/**
-	 * Returns some HTML structures
-	 * 
-	 * @param string 	$type
-	 * @return string
-	 */
-	private static function html($type) {
-		switch ($type) {
-			case 'header':
-				return 
-					static::css() . '
-					<div id="mata_hari_debug">
-						<div id="title">Mata Hari - exotic espionage for PHP</div>
-						<div id="mata_hari_values">';
-				break;
-			
-			case 'footer':
-				return 
-					'</div>
-					<br style="clear: both;" />
-				</div>';
-		}
-	}
-
-	/**
-	 * Returns CSS for output
-	 *
-	 * @return string
-	 */
-	private static function css() {
-		return '
-		<style>
-			#mata_hari_debug {
-				margin-bottom: 5px;
-				font-family: \'Courier New\', sans-serif;
-				width: 85%;
-				height: 700px;
-				margin: auto;
-				background-color: #141414;
-				color: #e2e2e2;
-				border: 5px solid #ccc;
-				text-align: left;
-				overflow: auto;
-			}
-			
-			#mata_hari_debug #title {
-				display: block;
-				width: 100%;
-				padding: 5px;
-				background-color: #ccc;
-				color: #f00;
-				font-size: 20px;
-				font-weight: bold;
-				clear: both;
-			}
-			.spy-marker {
-				padding: 5px;
-				border-bottom: 1px solid #3d3d3d;
-			}
-			.spy-marker-time {
-				padding: 5px;
-				border-bottom: 1px solid #3d3d3d;
-				padding-bottom: 10px;
-				padding-top: 10px;
-			}
-			.time {
-				color: #ffe13d;
-			}
-			.marker-name {
-				color: #7eaccc;
-			}
-			.even {
-
-			}
-			.odd {
-				background-color: #282828;
-			}
-			.meta-info {
-				font-weight: bold;
-				padding: 5px;
-				padding-top: 10px;
-				padding-bottom: 10px;
-				margin-bottom: 20px;
-				border-bottom: 1px dashed #3d3d3d;
-				line-height: 20px;
-			}
-		</style>
-		';
-	}
-
-	/**
-	 * Helper function to wrap the string in <pre> tags
-	 *
-	 * @param string $string
-	 * @return string
-	 */
-	private static function pre($string) {
-		return '<pre>'.$string.'</pre>';
 	}
 
 }
