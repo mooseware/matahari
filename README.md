@@ -1,5 +1,5 @@
-Matahari Bundle for the Laravel Framework
-=======================================
+Matahari Bundle for Laravel
+===========================
 
 This bundle enables nicer debugging by spying on vars while a script executes. You could also set time- or memory-marker to see, which time it took to get from start to the specified time-marker, or how much memory is being consumed on a certain point. All markers can be printed out at the end of the espionage.
 
@@ -48,7 +48,9 @@ Changelog
 
 Install
 =======
-Simply add
+Download this Bundle, extract it to `bundles/matahari`
+
+Then simply add
     
     return array(
        'matahari' => array('auto' => true),
