@@ -41,6 +41,7 @@ Here's how to use Matahari:
 Changelog
 =========
 **0.5.0**
+
 - Support for Laravel 3.7.1
 - Matahari must now be called via after filter in route
 
@@ -52,7 +53,7 @@ Simply add
     return array(
        'matahari' => array('auto' => true),
     );
-    
+
 to your `application/bundles.php`
 
 
