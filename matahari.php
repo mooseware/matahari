@@ -3,7 +3,7 @@
 class Matahari
 {
 
-	const VERSION = '0.4.1';
+	const VERSION = '0.5.0';
 	
 	private static $_instance = null;
 	private static $_result = array();

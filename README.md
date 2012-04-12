@@ -5,7 +5,7 @@ This bundle enables nicer debugging by spying on vars while a script executes. Y
 
 Here's how to use Matahari:
 
-    Router::register(array('GET /', 'GET /home'), function()
+    Route::get('/', array('after' => 'matahari', function()
     {
         $i = 0;
         Matahari::init();
@@ -34,10 +34,28 @@ Here's how to use Matahari:
         $object = new \stdClass;
         Matahari::spy($object, "The Quatermaster");
 
-        return View::make('view.index')->with('output', Matahari::spit()->to_board());
-    });
+        return View::make('home.index');
+    }));
 
+
+Changelog
+=========
+**0.5.0**
+- Support for Laravel 3.7.1
+- Matahari must now be called via after filter in route
+
+
+Install
+=======
+Simply add
     
+    return array(
+       'matahari' => array('auto' => true),
+    );
+    
+to your `application/bundles.php`
+
+
 Notice
 =======
 **This bundle is still under development!**
