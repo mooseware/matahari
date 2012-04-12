@@ -6,11 +6,11 @@ class Matahari
 	const VERSION = '0.4.0';
 	
 	private static $_instance = null;
-	private static $_result = '';
+	private static $_result = array();
 	private static $_stack = array();
 	private static $_config = array();
-	private static $start = '';
-	private static $end = '';
+	public static $start = '';
+	public static $end = '';
 
 	/**
 	 * Instantiation
@@ -170,67 +170,9 @@ class Matahari
 
 		if ( ! static::instance()) static::init();
 
-		static::$_result = static::html('header');
-		$time_diff = static::$end - static::$start;
-		static::$_result.= '<div class="meta-info">';
-		static::$_result.= 'Total Execution Time: <span class="time">'.round($time_diff, 4).'s</span>';
-		static::$_result.= '<br />Total Consumed Memory: <span class="memory">'.round(memory_get_usage() / pow(1024, 2), 3).'Mb</span>';
-		static::$_result.= '</div>';
-
-		$i = 1;
-		$odd_even = 'even';
-		foreach (static::$_stack as $item)
-		{
-			if ($item['name'] == '')
-			{
-				$item['name'] = '#'.$i;
-			}
-
-			static::$_result.=  '<div class="spy-marker-time '.$odd_even.'">';
-			switch ($item['type'])
-			{
-				case 'marker':
-					static::$_result.= sprintf(
-						'Marked <span class="marker-name">%s</span> [ <span class="time">%ss</span> <span class="memory">%sMb</span> ]', 
-						$item['name'], 
-						round(($item['time'] - static::$start), 4), 
-						round($item['memory'] / pow(1024, 2), 3)
-					);
-					break;
-
-				case 'look':
-					static::$_result.= sprintf(
-						'Look at <span class="marker-name">%s</span> [ <span class="time">%ss</span> <span class="memory">%sMb</span> (<span class="memory">%sMb</span>) ]',
-						$item['name'],
-						$item['time_diff'],
-						round($item['current_memory'] / pow(1024, 2), 3),
-						$item['memory_diff']
-					);
-					break;
-				
-				case 'spy':
-					static::$_result.= sprintf(
-						'Spying on <span class="marker-name">%s</span>%s',
-						$item['name'],
-						static::pre($item['content'])
-					);
-					break;
-
-				case 'memory':
-					static::$_result.= sprintf(
-						'Memory consumed at marker <span class="marker-name">%s</span></em>: <span class="time">%sMb</span>',
-						$item['name'],
-						round($item['memory'] / pow(1024, 2), 3)
-					);
-					break;
-			}
-			static::$_result.= '</div>';
-
-			$i++;
-			($odd_even == 'even') ? $odd_even = 'odd' : $odd_even = 'even';
-		}
-
-		static::$_result.= static::html('footer');
+		static::$_result['total_time'] = round((static::$end - static::$start), 4);
+		static::$_result['total_memory'] = round(memory_get_usage() / pow(1024, 2), 3);
+		static::$_result['items'] = static::$_stack;
 
 		return static::$_instance;
 	}
@@ -260,42 +202,6 @@ class Matahari
 	private static function instance()
 	{
 		return ( ! is_null(static::$_instance));
-	}
-
-	/**
-	 * Returns some HTML structures
-	 * 
-	 * @param string 	$type
-	 * @return string
-	 */
-	private static function html($type)
-	{
-		switch ($type)
-		{
-			case 'header':
-				return 
-					'<div id="mata_hari_debug">
-						<div id="title">Mata Hari - exotic espionage for PHP</div>
-						<div id="mata_hari_values">';
-				break;
-			
-			case 'footer':
-				return 
-					'</div>
-					<br style="clear: both;" />
-				</div>';
-		}
-	}
-
-	/**
-	 * Helper function to wrap the string in <pre> tags
-	 *
-	 * @param string $string
-	 * @return string
-	 */
-	private static function pre($string)
-	{
-		return '<pre>'.$string.'</pre>';
 	}
 
 }
