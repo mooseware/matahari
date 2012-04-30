@@ -3,6 +3,11 @@ Matahari Bundle for Laravel
 
 This bundle enables nicer debugging by spying on vars while a script executes. You could also set time- or memory-marker to see, which time it took to get from start to the specified time-marker, or how much memory is being consumed on a certain point. All markers can be printed out at the end of the espionage.
 
+There are at least three filters available to be used:
+- matahari_board: appends the logged items as HTML to your view
+- matahari_ff: pushes the logged items to your FirePHP console (you'll need to have [Firebug](https://addons.mozilla.org/de/firefox/addon/firebug/) & [FirePHP](http://www.firephp.org/) installed)
+- matahari_chrome: pushes the logged items to your ChromePHP console (you'll need to have [ChromePHP](http://www.chromephp.com/) installed)
+
 Here's how to use Matahari:
 
     Route::get('/', array('after' => 'matahari_board', function()
@@ -42,8 +47,7 @@ Changelog
 =========
 **0.6.0**
 
-- Two awesome NEW methods of displaying: FirePHP and ChromePHP
-Simply set the filter to either `matahari_ff` or `matahari_chrome`
+- Two awesome new features: spit to FirePHP or to ChromePHP
 
 
 **0.5.0**
