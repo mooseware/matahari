@@ -8,7 +8,7 @@ There are at least three filters available to be used:
 - matahari_ff: pushes the logged items to your FirePHP console (you'll need to have [Firebug](https://addons.mozilla.org/de/firefox/addon/firebug/) & [FirePHP](http://www.firephp.org/) installed)
 - matahari_chrome: pushes the logged items to your ChromePHP console (you'll need to have [ChromePHP](http://www.chromephp.com/) installed)
 
-Here's how to use Matahari:
+Here's an example how to use Matahari:
 
     Route::get('/', array('after' => 'matahari_board', function()
     {
@@ -83,8 +83,3 @@ Requirements
 Output (example)
 =================
 ![Matahari Screenshot](https://github.com/mooseware/matahari/raw/develop/screenshots/screenshot.png)
-
-
-More 2 come
-=======
-such as: instantiation with config array for more output ($_REQUEST, $_SESSION etc.)
