@@ -187,6 +187,10 @@ class Matahari
 		return static::$_result;
 	}
 
+	/**
+	 * Uses FirePHP for outputting data
+	 * 
+	 */
 	public function to_ff()
 	{
 		include 'vendor/FirePHP.class.php';
@@ -226,6 +230,10 @@ class Matahari
 		}
 	}
 
+	/**
+	 * Uses ChromePHP for outputting data
+	 * 
+	 */
 	public function to_chrome()
 	{
 		include 'vendor/ChromePHP.php';
