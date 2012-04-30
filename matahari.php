@@ -187,12 +187,81 @@ class Matahari
 		return static::$_result;
 	}
 
-	/**
-	 * Streams result into a file
-	 * 
-	 * @todo: write method!
-	 */
-	public function to_file($path) {}
+	public function to_ff()
+	{
+		include 'vendor/FirePHP.class.php';
+
+		$firephp = FirePHP::getInstance(true);
+
+		$firephp->log(static::$_result['total_time']."s", 'Total Execution Time:');
+		$firephp->log(static::$_result['total_memory']."Mb", 'Total Consumed Memory:');
+		
+		$i = 1;
+		foreach(static::$_result['items'] as $item)
+		{
+		
+			if ($item['name'] == '')
+			{
+				$item['name'] = '#'.$i;
+			}
+
+			switch ($item['type'])
+			{
+				case 'marker':
+					$firephp->log('Marked \''.$item['name'].'\' [ '.round(($item['time'] - Matahari::$start), 4).'s  '.round($item['memory'] / pow(1024, 2), 3).'Mb ]');
+					break;
+
+				case 'look':
+					$firephp->log('Look at \''.$item['name'].'\' [ '.$item['time_diff'].'s  '.round($item['current_memory'] / pow(1024, 2), 3).'Mb ('.$item['memory_diff'].'Mb) ]');
+					break;
+				
+				case 'spy':
+					$firephp->log($item['content'], 'Spying on \''.$item['name'].'\'');
+					break;
+
+				case 'memory':
+					$firephp->log('Memory consumed at marker \''.$item['name'].'\': '.round($item['memory'] / pow(1024, 2), 3).'Mb');
+					break;
+			}
+		}
+	}
+
+	public function to_chrome()
+	{
+		include 'vendor/ChromePHP.php';
+		
+		ChromePHP::log('Total Execution Time:', static::$_result['total_time']."s");
+		ChromePHP::log('Total Consumed Memory:', static::$_result['total_memory']."Mb");
+		
+		$i = 1;
+		foreach(static::$_result['items'] as $item)
+		{
+		
+			if ($item['name'] == '')
+			{
+				$item['name'] = '#'.$i;
+			}
+
+			switch ($item['type'])
+			{
+				case 'marker':
+					ChromePHP::log('Marked \''.$item['name'].'\' [ '.round(($item['time'] - Matahari::$start), 4).'s  '.round($item['memory'] / pow(1024, 2), 3).'Mb ]');
+					break;
+
+				case 'look':
+					ChromePHP::log('Look at \''.$item['name'].'\' [ '.$item['time_diff'].'s  '.round($item['current_memory'] / pow(1024, 2), 3).'Mb ('.$item['memory_diff'].'Mb) ]');
+					break;
+				
+				case 'spy':
+					ChromePHP::log('Spying on \''.$item['name'].'\': ', $item['content']);
+					break;
+
+				case 'memory':
+					ChromePHP::log('Memory consumed at marker \''.$item['name'].'\': '.round($item['memory'] / pow(1024, 2), 3).'Mb');
+					break;
+			}
+		}
+	}
 
 	/**
 	 * Checks if instance has been created

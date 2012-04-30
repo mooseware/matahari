@@ -5,7 +5,7 @@ This bundle enables nicer debugging by spying on vars while a script executes. Y
 
 Here's how to use Matahari:
 
-    Route::get('/', array('after' => 'matahari', function()
+    Route::get('/', array('after' => 'matahari_board', function()
     {
         $i = 0;
         Matahari::init();
@@ -40,6 +40,12 @@ Here's how to use Matahari:
 
 Changelog
 =========
+**0.6.0**
+
+- Two awesome NEW methods of displaying: FirePHP and ChromePHP
+Simply set the filter to either `matahari_ff` or `matahari_chrome`
+
+
 **0.5.0**
 
 - Support for Laravel 3.7.1
