@@ -68,12 +68,12 @@ class Matahari
      * @param mixed $element
      * @param string $markerName
      */
-    public static function setSpyPoint($element, $markerName = '')
+    public static function setSpyPointMarker($element, $markerName = '')
     {
         if ( ! static::instance()) static::init();
 
         static::$_stack[] = [
-            'type' => 'spyPoint',
+            'type' => 'spyPointMarker',
             'markerName' => $markerName,
             'content' => print_r($element, true),
         ];
@@ -85,7 +85,7 @@ class Matahari
      * @param string $markerName
      * @return bool
      */
-    public static function look($markerName = '')
+    public static function setLookPointMarker($markerName = '')
     {
         if ( ! static::instance()) static::init();
 
@@ -112,11 +112,11 @@ class Matahari
         }
 
         $item = [
-            'type' => 'lookPoint',
+            'type' => 'lookPointMarker',
             'current_memory' => $currentMemory,
             'time_diff' => round($timeDiff, 4),
             'memory_diff' => $memoryDiff,
-            'name' => $markerName,
+            'markerName' => $markerName,
         ];
 
         static::$_stack[] = $item;
@@ -162,7 +162,7 @@ class Matahari
 
         static::$_result['total_time'] = round((static::$end - static::$start), 4);
         static::$_result['total_memory'] = round(memory_get_usage() / pow(1024, 2), 3);
-        static::$_result['items'] = static::$_stack;
+        static::$_result['markers'] = static::$_stack;
 
         return static::$_result;
     }
