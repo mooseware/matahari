@@ -69,7 +69,7 @@ class Matahari
      * @param string $markerName
      * @return bool
      */
-    public static function setLookPointMarker($markerName = '')
+    public static function setLookPointMarker($markerName = '', $message = '')
     {
         if ( ! static::instance()) static::init();
 
@@ -101,6 +101,7 @@ class Matahari
             'time_diff' => round($timeDiff, 4),
             'memory_diff' => $memoryDiff,
             'markerName' => $markerName,
+            'message' => $message,
         ];
     }
 
