@@ -109,13 +109,13 @@ class Matahari
      *
      * @param string $markerName
      * @return int $key
-     * @throws Exception
+     * @throws \Exception
      */
     private static function findMarker($markerName)
     {
         $return = false;
         foreach (static::$_stack as $key => $item) {
-            if ($item['type'] == 'timeMarker' and $item['name'] == $markerName) {
+            if ($item['type'] == 'timeMarker' and $item['markerName'] == $markerName) {
                 // we cannot return the first matched key here as we wish to
                 // always get the latest key of the marker returned.
                 // Marker can repeat themselves but should be displayed
