@@ -47,22 +47,6 @@ class Matahari
     }
 
     /**
-     * Sets a memory marker
-     *
-     * @param string $markerName
-     */
-    public static function setMemoryMarker($markerName = '')
-    {
-        if ( ! static::instance()) static::init();
-
-        static::$_stack[] = [
-            'type' => 'memoryMarker',
-            'memory' => memory_get_usage(),
-            'markerName' => $markerName
-        ];
-    }
-
-    /**
      * Spies on an element
      *
      * @param mixed $element
@@ -111,15 +95,13 @@ class Matahari
             }
         }
 
-        $item = [
+        static::$_stack[] = [
             'type' => 'lookPointMarker',
             'current_memory' => $currentMemory,
             'time_diff' => round($timeDiff, 4),
             'memory_diff' => $memoryDiff,
             'markerName' => $markerName,
         ];
-
-        static::$_stack[] = $item;
     }
 
     /**
@@ -133,7 +115,7 @@ class Matahari
     {
         $return = false;
         foreach (static::$_stack as $key => $item) {
-            if ($item['type'] == 'marker' and $item['name'] == $markerName) {
+            if ($item['type'] == 'timeMarker' and $item['name'] == $markerName) {
                 // we cannot return the first matched key here as we wish to
                 // always get the latest key of the marker returned.
                 // Marker can repeat themselves but should be displayed
