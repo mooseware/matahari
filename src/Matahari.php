@@ -97,9 +97,9 @@ class Matahari
 
         static::$_stack[] = [
             'type' => 'lookPointMarker',
-            'current_memory' => $currentMemory,
-            'time_diff' => round($timeDiff, 4),
-            'memory_diff' => $memoryDiff,
+            'currentMemory' => $currentMemory,
+            'timeElapsedSinceMarkerSet' => round($timeDiff, 4),
+            'memoryDiffSinceMarkerSet' => $memoryDiff,
             'markerName' => $markerName,
             'message' => $message,
         ];
@@ -117,10 +117,7 @@ class Matahari
         $return = false;
         foreach (static::$_stack as $key => $item) {
             if ($item['type'] == 'timeMarker' and $item['markerName'] == $markerName) {
-                // we cannot return the first matched key here as we wish to
-                // always get the latest key of the marker returned.
-                // Marker can repeat themselves but should be displayed
-                // as if they have been reset!
+                // return latest found marker key
                 $return = $key;
             }
         }
@@ -143,8 +140,8 @@ class Matahari
 
         if ( ! static::instance()) static::init();
 
-        static::$_result['total_time'] = round((static::$end - static::$start), 4);
-        static::$_result['total_memory'] = round(memory_get_usage() / pow(1024, 2), 3);
+        static::$_result['totalTime'] = round((static::$end - static::$start), 4);
+        static::$_result['totalMemory'] = round(memory_get_usage() / pow(1024, 2), 3);
         static::$_result['markers'] = static::$_stack;
 
         return static::$_result;
